@@ -4,8 +4,9 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage, FlexSendMessage, PostbackEvent
 #import json
 
-import google_sheet_20250316  # 匯入google_sheet.py
+import google_sheet_20250328  # 匯入google_sheet.py
 
+google_sheet = google_sheet_20250328
 app = Flask(__name__)
 
 #  Channel Access Token 和 Channel Secret
@@ -42,7 +43,7 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
         return
     
-    reply_message = google_sheet_20250316.get_response(user_id_or_group_id, user_message)
+    reply_message = google_sheet.get_response(user_id_or_group_id, user_message)
     
     if user_message == "功能":
 
@@ -71,14 +72,15 @@ def handle_message(event):
         return
 
     if user_message == "#關鍵字清單":
-        reply_message = google_sheet_20250316.get_all_keywords(user_id_or_group_id)
+        reply_message = google_sheet.get_all_keywords(user_id_or_group_id)
         text_message = TextSendMessage(text=reply_message)
         line_bot_api.reply_message(event.reply_token, text_message)
         return
 
     if user_message == "#紀錄表":
-        reply_message = google_sheet_20250316.get_function_options(user_id_or_group_id)
-        line_bot_api.reply_message(event.reply_token, reply_message)
+        reply_message = google_sheet.get_record_data(user_id_or_group_id)
+        text_message = TextSendMessage(text=reply_message)
+        line_bot_api.reply_message(event.reply_token, text_message)
         return
 
     if reply_message:
@@ -99,7 +101,7 @@ def handle_postback(event):
     print(f"收到 Postback: {postback_data} (來自: {user_id_or_group_id})")
     if postback_data.startswith("get_function_details"):
         option = postback_data.split(":", 1)[1].strip()  # 取得項目名稱
-        reply_message = google_sheet_20250316.get_function_details(user_id_or_group_id, option)
+        reply_message = google_sheet.get_function_details(user_id_or_group_id, option)
 
     if reply_message:
         if isinstance(reply_message, str):

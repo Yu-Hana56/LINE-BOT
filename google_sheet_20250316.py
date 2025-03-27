@@ -1,3 +1,5 @@
+import json
+import os
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import random
@@ -5,7 +7,8 @@ from linebot.models import FlexSendMessage
 
 # 設定 Google API 權限
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("hana-linebot-e2cfe8a550b3.json", scope)
+service_account_info = json.loads(os.getenv("GOOGLE_CREDENTIALS"))
+creds = ServiceAccountCredentials.from_json_keyfile_dict(service_account_info, scope)
 client = gspread.authorize(creds)
 
 # 開啟 Google 試算表

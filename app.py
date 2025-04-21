@@ -1,23 +1,25 @@
-#20250414
+#20250421
 
 from flask import Flask, request
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage, FlexSendMessage, PostbackEvent
+import threading
 #import json
 
-import google_sheet_20250414  # 匯入google_sheet.py
+import google_sheet_20250421  # 匯入google_sheet.py
+import reminder
 
 app = Flask(__name__)
 
 #  測試員
-#LINE_CHANNEL_ACCESS_TOKEN = "WDZuclPojc3qvkky3UTFWiZqByyD2CZCg7W4nUcAakLtq2UElgColm5yLNcQJjzg88VhfN06YKNSeU0T8HSne+IVW3ENnlSA3A008suYKlypRRRenKssCTGKH3uGT/ztbukbiu5+DcvZVHZcUPtkeAdB04t89/1O/w1cDnyilFU="
-#LINE_CHANNEL_SECRET = "7b432f773cac5194ece7799b4be9cb28"
+LINE_CHANNEL_ACCESS_TOKEN = "WDZuclPojc3qvkky3UTFWiZqByyD2CZCg7W4nUcAakLtq2UElgColm5yLNcQJjzg88VhfN06YKNSeU0T8HSne+IVW3ENnlSA3A008suYKlypRRRenKssCTGKH3uGT/ztbukbiu5+DcvZVHZcUPtkeAdB04t89/1O/w1cDnyilFU="
+LINE_CHANNEL_SECRET = "7b432f773cac5194ece7799b4be9cb28"
 
 
 #  小幫手
-LINE_CHANNEL_ACCESS_TOKEN = "d187fh/lwQnmxlSrJCr9oBnPpiY6PXqtjHj7T23RwqN7xOb5zCOYwE3BAFsZYgsZDgn6SuA/hpRcdHBO5/40cfLUHmHX9G5RcwyhR5Tv1IyReAXtE7/EpeDuAgVjvZ5MpD8WasTWG/iE9iedjXcu4AdB04t89/1O/w1cDnyilFU="
-LINE_CHANNEL_SECRET = "18629adaf5a3b0aaf8572849c66e23da"
+#LINE_CHANNEL_ACCESS_TOKEN = "d187fh/lwQnmxlSrJCr9oBnPpiY6PXqtjHj7T23RwqN7xOb5zCOYwE3BAFsZYgsZDgn6SuA/hpRcdHBO5/40cfLUHmHX9G5RcwyhR5Tv1IyReAXtE7/EpeDuAgVjvZ5MpD8WasTWG/iE9iedjXcu4AdB04t89/1O/w1cDnyilFU="
+#LINE_CHANNEL_SECRET = "18629adaf5a3b0aaf8572849c66e23da"
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
@@ -49,7 +51,7 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
         return
     
-    reply_message = google_sheet_20250414.get_response(user_id_or_group_id, user_message)
+    reply_message = google_sheet_20250421.get_response(user_id_or_group_id, user_message)
     
     if user_message == "功能":
 
@@ -79,13 +81,13 @@ def handle_message(event):
         return
 
     if user_message == "#關鍵字清單":
-        reply_message = google_sheet_20250414.get_all_keywords(user_id_or_group_id)
+        reply_message = google_sheet_20250421.get_all_keywords(user_id_or_group_id)
         text_message = TextSendMessage(text=reply_message)
         line_bot_api.reply_message(event.reply_token, text_message)
         return
 
     if user_message == "#紀錄表":
-        reply_message = google_sheet_20250414.get_function_options(user_id_or_group_id)
+        reply_message =google_sheet_20250421.get_function_options(user_id_or_group_id)
         text_message = TextSendMessage(text=reply_message)
         line_bot_api.reply_message(event.reply_token, text_message)
         return
@@ -108,7 +110,7 @@ def handle_postback(event):
     print(f"收到 Postback: {postback_data} (來自: {user_id_or_group_id})")
     if postback_data.startswith("get_function_details"):
         option = postback_data.split(":", 1)[1].strip()  # 取得項目名稱
-        reply_message = google_sheet_20250414.get_function_details(user_id_or_group_id, option)
+        reply_message = google_sheet_20250421.get_function_details(user_id_or_group_id, option)
 
     if reply_message:
         if isinstance(reply_message, str):
@@ -116,5 +118,10 @@ def handle_postback(event):
         else:
             line_bot_api.reply_message(event.reply_token, reply_message)
 
+def start_reminder_scheduler():
+    thread = threading.Thread(target=reminder.run_scheduler, daemon=True)
+    thread.start()
+
 if __name__ == "__main__":
+    start_reminder_scheduler()
     app.run(host="0.0.0.0", port=8000)

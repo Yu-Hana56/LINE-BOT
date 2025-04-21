@@ -1,12 +1,9 @@
 name: Reminder Bot Scheduler
 
 on:
-  push:
-    branches:
-      - master  # 只在 master 分支有更新時觸發工作流程
   schedule:
     - cron: '55 10 * * *'  # 台灣時間 18:45 (UTC+8 -> UTC 10:45)
-
+  workflow_dispatch:  # 也允許手動觸發
 jobs:
   reminder:
     runs-on: ubuntu-latest

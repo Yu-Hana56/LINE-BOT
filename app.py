@@ -4,9 +4,8 @@ from flask import Flask, request
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage, FlexSendMessage, PostbackEvent
-import threading
-#import json
 
+import threading
 import google_sheet_20250421  # 匯入google_sheet.py
 import reminder
 
@@ -39,7 +38,7 @@ def callback():
         return "驗證失敗", 400
     return "OK", 200
 
-##關鍵字回覆##
+## 關鍵字回覆 ##
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):  
     user_message = event.message.text
@@ -122,7 +121,6 @@ def start_reminder_scheduler():
     thread = threading.Thread(target=reminder.run_scheduler, daemon=True)
     thread.start()
 
-threading.Thread(target=reminder.run_scheduler, daemon=True).start()
 
 if __name__ == "__main__":
     start_reminder_scheduler()

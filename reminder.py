@@ -58,3 +58,4 @@ def run_scheduler():
 if __name__ == "__main__":
     #run_scheduler() #測試提醒使用(本地電腦)
     send_reminder()
+    

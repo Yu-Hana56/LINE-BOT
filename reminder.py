@@ -28,6 +28,7 @@ def send_reminder():
 
     user_messages = {}
     for user_id, name, due_date in due_dates:
+        due_date = due_date.date()
         days_left = (due_date - today).days +1
         if days_left in [7, 3, 2, 1]:  # 截止日期是 7、3、2、1 天後
             message = f"{name} 剩 {days_left} 天到期!"

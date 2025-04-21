@@ -47,7 +47,7 @@ def run_scheduler():
         today = now.date()
         current_time = now.strftime("%H:%M")
 
-        if today == next_notify_date and current_time >= "17:45":
+        if today == next_notify_date and current_time >= "18:00":
             send_reminder()
             next_notify_date = today + timedelta(days=1)
 

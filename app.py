@@ -122,6 +122,8 @@ def start_reminder_scheduler():
     thread = threading.Thread(target=reminder.run_scheduler, daemon=True)
     thread.start()
 
+threading.Thread(target=reminder.run_scheduler, daemon=True).start()
+
 if __name__ == "__main__":
     start_reminder_scheduler()
     app.run(host="0.0.0.0", port=8000)

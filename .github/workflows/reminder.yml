@@ -22,5 +22,7 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run reminder script
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
       run: |
         python reminder.py  # 執行 reminder.py 這個檔案

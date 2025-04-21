@@ -1,6 +1,6 @@
 #20250421
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import schedule
 import time
 from linebot import LineBotApi
@@ -39,18 +39,19 @@ def send_reminder():
             line_bot_api.push_message(user_id, TextMessage(text=message_text))
 
 
-# 設定每天 10:00 檢查
-def job():
-    send_reminder()
-
-# 設定每天 10:00 檢查
-schedule.every().day.at("17:15").do(job)
-
-# 持續運行，這裡會保持程序運行直到下一次提醒時間
+# 提醒
 def run_scheduler():
+    next_notify_date = datetime.today().date()
     while True:
-        schedule.run_pending()  # 只檢查待處理的任務
-        time.sleep(60)  # 每分鐘檢查一次，確保在預定時間發送提醒
+        now = datetime.now()
+        today = now.date()
+        current_time = now.strftime("%H:%M")
+
+        if today == next_notify_date and current_time >= "17:45":
+            send_reminder()
+            next_notify_date = today + timedelta(days=1)
+
+        time.sleep(60)# 每分鐘檢查一次，確保在預定時間發送提醒
 
 if __name__ == "__main__":
     run_scheduler()

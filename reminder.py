@@ -26,9 +26,8 @@ def get_due_dates():
 # 發送提醒訊息
 def send_reminder():
     due_dates = get_due_dates()
-    now = datetime.datetime.now(ZoneInfo("Asia/Taipei"))
-    today = now.date()
-
+    today = datetime.datetime.now(ZoneInfo("Asia/Taipei")).date()
+    
     user_messages = {}
     for user_id, name, due_date in due_dates:
         days_left = (due_date - today).days +1
@@ -63,4 +62,3 @@ def run_scheduler():
 if __name__ == "__main__":
     #run_scheduler() #測試提醒使用(本地電腦)
     send_reminder()
-    

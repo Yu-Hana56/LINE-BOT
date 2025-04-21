@@ -2,7 +2,7 @@ name: Daily Reminder
 
 on:
   schedule:
-    - cron: '45 10 * * *'  # 台灣時間 18:45（UTC+8 → UTC 10:45）
+    - cron: '42 10 * * *'  # 台灣時間 18:45（UTC+8 → UTC 10:45）
   workflow_dispatch:  # 手動觸發用
 
 jobs:

@@ -1,9 +1,7 @@
 #20250421
 
 from zoneinfo import ZoneInfo
-import datetime
-
-#from datetime import datetime, timedelta  #本地電腦使用
+from datetime import datetime, timedelta
 import schedule
 import time
 from linebot import LineBotApi
@@ -26,8 +24,8 @@ def get_due_dates():
 # 發送提醒訊息
 def send_reminder():
     due_dates = get_due_dates()
-    today = datetime.datetime.now(ZoneInfo("Asia/Taipei")).date()
-    
+    today = datetime.now(ZoneInfo("Asia/Taipei")).date()
+
     user_messages = {}
     for user_id, name, due_date in due_dates:
         days_left = (due_date - today).days +1

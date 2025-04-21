@@ -5,7 +5,7 @@ import schedule
 import time
 from linebot import LineBotApi
 from linebot.models import TextMessage
-import google_sheet_20250414  # 匯入 google_sheet 操作模組
+import google_sheet_20250421  # 匯入 google_sheet 操作模組
 
 # LINE Bot 初始化
 LINE_CHANNEL_ACCESS_TOKEN = "WDZuclPojc3qvkky3UTFWiZqByyD2CZCg7W4nUcAakLtq2UElgColm5yLNcQJjzg88VhfN06YKNSeU0T8HSne+IVW3ENnlSA3A008suYKlypRRRenKssCTGKH3uGT/ztbukbiu5+DcvZVHZcUPtkeAdB04t89/1O/w1cDnyilFU="
@@ -13,7 +13,7 @@ line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 
 # 取得紀錄表中的「名稱」和「截止日期」
 def get_due_dates():
-    return google_sheet_20250414.get_all_due_dates()  # 從 google_sheet_20250414 取得資料
+    return google_sheet_20250421.get_all_due_dates()  # 從 google_sheet_20250414 取得資料
 
 # 發送提醒訊息
 def send_reminder():
@@ -38,7 +38,7 @@ def job():
     send_reminder()
 
 # 設定每天 10:00 檢查
-schedule.every().day.at("16:30").do(job)
+schedule.every().day.at("16:40").do(job)
 
 # 持續運行，這裡會保持程序運行直到下一次提醒時間
 def run_scheduler():

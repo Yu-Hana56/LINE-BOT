@@ -46,7 +46,7 @@ def job():
     send_reminder()
 
 # 設定每天 10:00 檢查
-schedule.every().day.at("16:49").do(job)
+schedule.every().day.at("17:00").do(job)
 
 # 持續運行，這裡會保持程序運行直到下一次提醒時間
 def run_scheduler():

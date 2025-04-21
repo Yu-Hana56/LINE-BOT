@@ -7,8 +7,6 @@ from linebot import LineBotApi
 from linebot.models import TextMessage
 import google_sheet_20250421  # 匯入 google_sheet 操作模組
 
-# LINE Bot 初始化
-
 #  測試員
 #LINE_CHANNEL_ACCESS_TOKEN = "WDZuclPojc3qvkky3UTFWiZqByyD2CZCg7W4nUcAakLtq2UElgColm5yLNcQJjzg88VhfN06YKNSeU0T8HSne+IVW3ENnlSA3A008suYKlypRRRenKssCTGKH3uGT/ztbukbiu5+DcvZVHZcUPtkeAdB04t89/1O/w1cDnyilFU="
 
@@ -46,7 +44,7 @@ def job():
     send_reminder()
 
 # 設定每天 10:00 檢查
-schedule.every().day.at("17:00").do(job)
+schedule.every().day.at("17:03").do(job)
 
 # 持續運行，這裡會保持程序運行直到下一次提醒時間
 def run_scheduler():

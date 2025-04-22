@@ -2,7 +2,7 @@ name: Reminder Bot Scheduler
 
 on:
   schedule:
-    - cron: '00 02 * * *'  # UTC 02:00 -> 台灣時間 10:00
+    - cron: '30 03 * * *'  # UTC 03:30 → 台灣時間 11:30
   workflow_dispatch:  # 也允許手動觸發
 jobs:
   reminder:

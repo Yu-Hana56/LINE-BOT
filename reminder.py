@@ -1,6 +1,6 @@
 #20250422
 
-
+from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta
 import schedule
 import time
@@ -24,10 +24,11 @@ def get_due_dates():
 # 發送提醒訊息
 def send_reminder():
     due_dates = get_due_dates()
-    today = datetime.today()
+    today = datetime.now(ZoneInfo("Asia/Taipei")).date()
 
     user_messages = {}
     for user_id, name, due_date in due_dates:
+        due_date = due_date.date()
         days_left = (due_date - today).days
         if days_left == 1:  # 截止日期是 7、3、2、1 天後
             message = f"{name} 於今天到期!"

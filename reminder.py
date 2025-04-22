@@ -63,7 +63,7 @@ def send_reminder():
             notify.extend(messages['seven_message'])
 
         if notify :
-            message_text = "\n".join(messages)
+            message_text = "\n".join(notify)
             line_bot_api.push_message(user_id, TextMessage(text=message_text))
 
 

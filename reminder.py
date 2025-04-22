@@ -1,4 +1,4 @@
-#20250422
+#20250422_2
 
 from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta
@@ -30,27 +30,40 @@ def send_reminder():
     for user_id, name, due_date in due_dates:
         due_date = due_date.date()
         days_left = (due_date - today).days
-        if days_left == 0:  # 剩餘0天
-            message = f"{name} 於今天到期!"
-            if user_id not in user_messages:
-                user_messages[user_id]=[]
-            user_messages[user_id].append(message)
+        if user_id not in user_messages: # 建立各user_id的messages
+            user_messages[user_id] = {
+                'normal_messages': [],
+                'extra_messages': [],
+                'seven_message': []
+            }
 
-        if days_left == 1:  # 剩餘1天
-            message = f"{name} 於明天到期!"
-            if user_id not in user_messages:
-                user_messages[user_id]=[]
-            user_messages[user_id].append(message)
+        if days_left in [0, 1, 2, 3]: # 檢查剩0~3天
+            if days_left == 0:  # 剩餘0天
+                message = f"{name} 於今天到期!"
+            elif days_left == 1:  # 剩餘1天
+                message = f"{name} 於明天到期!"
+            else:  # 剩餘2、3天
+                message = f"{name} 於 {days_left} 天後到期!"
+            user_messages[user_id]['normal_messages'].append(message)
 
-        if days_left in [7, 3, 2]:  # 截止日期是 7、3、2天後
+        elif days_left in  [4, 5, 6]: # 檢查剩4~6天
             message = f"{name} 於 {days_left} 天後到期!"
-            if user_id not in user_messages:
-                user_messages[user_id]=[]
-            user_messages[user_id].append(message)
+            user_messages[user_id]['extra_messages'].append(message)
 
+        if days_left == 7: # 檢查剩7天
+            message = f"{name} 於 {days_left} 天後到期!"
+            user_messages[user_id]['seven_message'].append(message)
+
+    # 處理每個user_id的訊息
     for user_id, messages in user_messages.items():
-        message_text = "\n".join(messages)
-        if message_text :
+        notify = []
+        if messages['normal_messages'] or messages['seven_message']: # 若0 1 2 3 7有值就全部加總
+            notify.extend(messages['normal_messages'])
+            notify.extend(messages['extra_messages'])
+            notify.extend(messages['seven_message'])
+
+        if notify :
+            message_text = "\n".join(messages)
             line_bot_api.push_message(user_id, TextMessage(text=message_text))
 
 

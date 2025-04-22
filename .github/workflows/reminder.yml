@@ -2,7 +2,7 @@ name: Reminder Bot Scheduler
 
 on:
   schedule:
-    - cron: '30 10 * * *'  # 每天 UTC 10:30 = 台灣 18:30
+    - cron: '0 14 * * *'  # 每天 UTC 14:00 = 台灣 22:00
   workflow_dispatch:
 
 jobs:

@@ -124,4 +124,5 @@ def get_all_due_dates():
                         all_due_dates.append((user_id, name, due_date))
                     except:
                         continue
+    all_due_dates.sort(key=lambda x: x[2])
     return all_due_dates

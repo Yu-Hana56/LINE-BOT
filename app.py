@@ -1,4 +1,4 @@
-#20250421
+#20250422
 
 from flask import Flask, request
 from linebot import LineBotApi, WebhookHandler
@@ -121,6 +121,7 @@ def start_reminder_scheduler():
     thread = threading.Thread(target=reminder.run_scheduler, daemon=True)
     thread.start()
 
+start_reminder_scheduler()
 
 if __name__ == "__main__":
     start_reminder_scheduler()

@@ -19,7 +19,7 @@ line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 
 # 取得紀錄表中的「名稱」和「截止日期」
 def get_due_dates():
-    return google_sheet_20250421.get_all_due_dates()  # 從 google_sheet_20250414 取得資料
+    return google_sheet_20250421.get_all_due_dates()
 
 # 發送提醒訊息
 def send_reminder():
@@ -50,7 +50,7 @@ def run_scheduler():
         today = now.date()
         current_time = now.time()  # 使用時間對象比較
 
-        if today == next_notify_date and current_time >= datetime.strptime("14:00", "%H:%M").time():
+        if today == next_notify_date and current_time >= datetime.strptime("15:10", "%H:%M").time():
             send_reminder()
             next_notify_date = today + timedelta(days=1)
 

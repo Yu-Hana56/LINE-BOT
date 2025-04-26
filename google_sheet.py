@@ -56,8 +56,8 @@ def get_response(user_id_or_group_id,user_message):  #回傳對應的回應內�
     spreadsheet, sheet_list = get_user_spreadsheet(user_id_or_group_id)
 
     ## 紀錄表_新增 ##
-    if user_message.startswith("#新增項目 "):
-        item = user_message.replace("#新增項目 ", "").strip()
+    if user_message.startswith("#1 "):
+        item = user_message.replace("#1 ", "").strip()
         parts = item.split(" ", 2)
         if len(parts) == 3:
             category = parts[0]  # 類別
@@ -83,11 +83,11 @@ def get_response(user_id_or_group_id,user_message):  #回傳對應的回應內�
             record_sheet.append_row([category,name,name_date])
             return "已新增項目!"
         else:
-            return "格式錯誤，請使用「#新增項目 類別 名稱 日期」格式。"
+            return "格式錯誤，請使用「#1 類別 名稱 日期」格式。"
         
     ## 紀錄表_刪除 ##
-    if user_message.startswith("#刪除項目 "):
-        item = user_message.replace("#刪除項目 ", "").strip()
+    if user_message.startswith("#2 "):
+        item = user_message.replace("#2目 ", "").strip()
         record_sheet = spreadsheet.worksheet("紀錄表")
         names = record_sheet.col_values(2)  # 讀第一欄名字
         if item in names :
@@ -125,7 +125,7 @@ def get_response(user_id_or_group_id,user_message):  #回傳對應的回應內�
     
     ## 列出紀錄表_功能 ##
     if user_message == "#紀錄表_功能":
-        return "輸入「#新增項目 類別 名稱 日期」即可新增項目\n輸入「#刪除項目 名稱」即可刪除該項目"
+        return "輸入「#1 類別 名稱 日期」即可新增項目\n輸入「#2 名稱」即可刪除該項目"
 
 
     return None

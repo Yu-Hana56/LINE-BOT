@@ -70,8 +70,8 @@ def handle_message(event):
                                 "type": "message", "label": "紀錄表", "text": "#紀錄表" },
                                 "color": "#42659A" } ] },
                             {"type": "box", "layout": "vertical", "contents": [
-                            {"type": "text", "text": "紀錄表_功能", "size": "sm", "align": "center", "action": {
-                                "type": "message", "label": "紀錄表_功能", "text": "#紀錄表_功能" },
+                            {"type": "text", "text": "紀錄表_功能說明", "size": "sm", "align": "center", "action": {
+                                "type": "message", "label": "紀錄表_功能說明", "text": "#紀錄表_功能說明" },
                                 "color": "#42659A" } ] }
                                 ],
                                 "spacing": "md",

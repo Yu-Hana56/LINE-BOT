@@ -1,4 +1,4 @@
-#20250422_2
+#20250426
 
 from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta
@@ -6,7 +6,7 @@ import schedule
 import time
 from linebot import LineBotApi
 from linebot.models import TextMessage
-import google_sheet_20250421  # 匯入 google_sheet 操作模組
+import google_sheet  # 匯入 google_sheet 操作模組
 
 #  測試員
 #LINE_CHANNEL_ACCESS_TOKEN = "WDZuclPojc3qvkky3UTFWiZqByyD2CZCg7W4nUcAakLtq2UElgColm5yLNcQJjzg88VhfN06YKNSeU0T8HSne+IVW3ENnlSA3A008suYKlypRRRenKssCTGKH3uGT/ztbukbiu5+DcvZVHZcUPtkeAdB04t89/1O/w1cDnyilFU="
@@ -19,7 +19,7 @@ line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 
 # 取得紀錄表中的「名稱」和「截止日期」
 def get_due_dates():
-    return google_sheet_20250421.get_all_due_dates()
+    return google_sheet.get_all_due_dates()
 
 # 發送提醒訊息
 def send_reminder():
@@ -34,7 +34,8 @@ def send_reminder():
             user_messages[user_id] = {
                 'normal_messages': [],
                 'extra_messages': [],
-                'seven_message': []
+                'seven_message': [],
+                'two_weeks_message': []
             }
 
         if days_left in [0, 1, 2, 3]: # 檢查剩0~3天
@@ -54,13 +55,20 @@ def send_reminder():
             message = f"{name} 於 {days_left} 天後到期!"
             user_messages[user_id]['seven_message'].append(message)
 
+        if days_left == 14: # 檢查剩14天
+            message = f"{name} 於 {days_left} 天後到期!"
+            user_messages[user_id]['two_weeks_message'].append(message)
+
+        
+
     # 處理每個user_id的訊息
     for user_id, messages in user_messages.items():
         notify = []
-        if messages['normal_messages'] or messages['seven_message']: # 若0 1 2 3 7有值就全部加總
+        if messages['normal_messages'] or messages['seven_message'] or messages['two_weeks_message']: # 若0 1 2 3 7有值就全部加總
             notify.extend(messages['normal_messages'])
             notify.extend(messages['extra_messages'])
             notify.extend(messages['seven_message'])
+            notify.extend(messages['two_weeks_message'])
 
         if notify :
             message_text = "\n".join(notify)
@@ -76,7 +84,7 @@ def run_scheduler():
         today = now.date()
         current_time = now.time()  # 使用時間對象比較
 
-        if today == next_notify_date and current_time >= datetime.strptime("15:10", "%H:%M").time():
+        if today == next_notify_date and current_time >= datetime.strptime("21:49", "%H:%M").time():
             send_reminder()
             next_notify_date = today + timedelta(days=1)
 

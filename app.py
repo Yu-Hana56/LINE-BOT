@@ -71,7 +71,7 @@ def handle_message(event):
                                 "color": "#42659A" } ] },
                             {"type": "box", "layout": "vertical", "contents": [
                             {"type": "text", "text": "紀錄表_功能", "size": "sm", "align": "center", "action": {
-                                "type": "message", "label": "紀錄表_功能", "text": "輸入「#新增項目 類別 名稱 日期」即可新增項目\n輸入「#刪除項目 名稱」即可刪除該項目" },
+                                "type": "message", "label": "紀錄表_功能", "text": "#紀錄表_功能" },
                                 "color": "#42659A" } ] }
                                 ],
                                 "spacing": "md",

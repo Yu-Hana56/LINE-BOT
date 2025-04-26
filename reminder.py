@@ -14,7 +14,6 @@ import google_sheet  # 匯入 google_sheet 操作模組
 #  小幫手
 LINE_CHANNEL_ACCESS_TOKEN = "d187fh/lwQnmxlSrJCr9oBnPpiY6PXqtjHj7T23RwqN7xOb5zCOYwE3BAFsZYgsZDgn6SuA/hpRcdHBO5/40cfLUHmHX9G5RcwyhR5Tv1IyReAXtE7/EpeDuAgVjvZ5MpD8WasTWG/iE9iedjXcu4AdB04t89/1O/w1cDnyilFU="
 
-
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 
 # 取得紀錄表中的「名稱」和「截止日期」

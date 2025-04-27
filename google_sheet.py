@@ -124,7 +124,7 @@ def get_response(user_id_or_group_id,user_message):  #回傳對應的回應內�
         return get_function_options(user_id_or_group_id)
     
     ## 列出紀錄表_功能 ##
-    if user_message == "#紀錄表_功能":
+    if user_message == "#紀錄表_功能說明":
         return "輸入「#1 類別 名稱 日期」即可新增項目\n輸入「#2 名稱」即可刪除該項目"
 
 

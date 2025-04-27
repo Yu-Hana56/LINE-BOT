@@ -1,4 +1,4 @@
-#20250426
+#20250427
 
 import json
 import os
@@ -6,6 +6,8 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import random
 from datetime import datetime
+from linebot.models import TextSendMessage, QuickReply, QuickReplyButton, MessageAction
+
 
 # 設定 Google API 權限
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -55,48 +57,6 @@ def get_response(user_id_or_group_id,user_message):  #回傳對應的回應內�
 
     spreadsheet, sheet_list = get_user_spreadsheet(user_id_or_group_id)
 
-    ## 紀錄表_新增 ##
-    if user_message.startswith("#1 "):
-        item = user_message.replace("#1 ", "").strip()
-        parts = item.split(" ", 2)
-        if len(parts) == 3:
-            category = parts[0]  # 類別
-            name = parts[1]      # 名稱
-            name_date = parts[2] # 日期
-            
-            if "/" in name_date: # 確認日期格式
-                date_parts = name_date.split("/")
-                if len(date_parts) == 2: # MM/DD
-                    year = datetime.now().year
-                    month = int(date_parts[0])
-                    day = int(date_parts[1])
-                    name_date = f"{year}/{month:02d}/{day:02d}"
-                elif len(date_parts) == 3: # YYYY/MM/DD 格式，直接使用
-                    year = int(date_parts[0])
-                    month = int(date_parts[1])
-                    day = int(date_parts[2])
-                    if month < 1 or month > 12 or day < 1 or day > 31:
-                        return "日期格式不正確，請使用有效的日期 (MM/DD 或 YYYY/MM/DD 格式)。"
-                    name_date = f"{year}/{month:02d}/{day:02d}"
-
-            record_sheet = spreadsheet.worksheet("紀錄表")
-            record_sheet.append_row([category,name,name_date])
-            return "已新增項目!"
-        else:
-            return "格式錯誤，請使用「#1 類別 名稱 日期」格式。"
-        
-    ## 紀錄表_刪除 ##
-    if user_message.startswith("#2 "):
-        item = user_message.replace("#2目 ", "").strip()
-        record_sheet = spreadsheet.worksheet("紀錄表")
-        names = record_sheet.col_values(2)  # 讀第一欄名字
-        if item in names :
-            row_index = names.index(item) +1# index從0開始，row從1開始
-            record_sheet.delete_rows(row_index)
-            return f"已刪除項目：{item}"
-        else :
-            return "找不到項目"
-
     ## 關鍵字回覆 ##
     default_sheet = spreadsheet.worksheet("關鍵字")
     keywords = default_sheet.col_values(1)  # 讀取第一欄（關鍵字）
@@ -115,19 +75,10 @@ def get_response(user_id_or_group_id,user_message):  #回傳對應的回應內�
             if len(options) > 1:
                 return random.choice(options[1:])
     
-    ## 列出關鍵字 ##
-    if user_message == "#關鍵字清單":
-        return get_all_keywords(user_id_or_group_id)
+    ## 列出紀錄表_功能說明 ##
+    if user_message == "#紀錄表_功能說明":
+        return "新增項目➡️\n　輸入「#1 類別 名稱 日期」or\n　「#新增項目 類別 名稱 日期」\n刪除項目➡️\n　輸入「#2 名稱」or\n　「#刪除項目 名稱」"
     
-    ## 列出紀錄表 ##
-    if user_message == "#紀錄表":
-        return get_function_options(user_id_or_group_id)
-    
-    ## 列出紀錄表_功能 ##
-    if user_message == "#紀錄表_功能":
-        return "輸入「#1 類別 名稱 日期」即可新增項目\n輸入「#2 名稱」即可刪除該項目"
-
-
     return None
 
 def get_all_keywords(user_id_or_group_id):    # 讀取所有關鍵字，並回傳
@@ -136,8 +87,7 @@ def get_all_keywords(user_id_or_group_id):    # 讀取所有關鍵字，並回�
     keywords = default_sheet.col_values(1)[1:] 
     return ", ".join(keywords)
 
-
-def get_function_options(user_id_or_group_id):  #讀取紀錄表中項目欄
+def get_reading_records(user_id_or_group_id, command_type="list"):  #讀取紀錄表中項目欄
     spreadsheet, sheet_list = get_user_spreadsheet(user_id_or_group_id)
     today = datetime.today().date()
     if "紀錄表" in sheet_list:
@@ -145,7 +95,7 @@ def get_function_options(user_id_or_group_id):  #讀取紀錄表中項目欄
         data = sheet.get_all_records()
 
         category_items = {}  # 用來分類
-
+        
         for row in data:
             category = str(row.get("類別", "")).strip()
             item = str(row.get("名稱", "")).strip()
@@ -163,16 +113,95 @@ def get_function_options(user_id_or_group_id):  #讀取紀錄表中項目欄
         if not category_items: # 避免空回傳
             return "無紀錄"
         
-        result = []
-        for category in sorted(category_items.keys()):  # 類別排序
-            result.append(f"------ {category} ------")
-            items = sorted(category_items[category],key=lambda x: x[0])
-            for deadline, item in items:
-                result.append(f"{deadline} - {item}")
+        if command_type == "list":
+            result = []
+            item_counter = 1  # 編號從 1 開始
+            first_category = True
+            for category in sorted(category_items.keys()):  # 類別排序
+                if first_category == True:
+                    result.append(f"------ {category} ------")
+                    first_category = False
+                else:
+                    result.append(f"\n------ {category} ------")
 
-        return "\n".join(result)
-    
+                items = sorted(category_items[category],key=lambda x: x[0])
+                for deadline, item in items:
+                    result.append(f"{item_counter}. {deadline} - {item}")
+                    item_counter += 1
+            return "\n".join(result)
+        
+        elif command_type == "delete":
+            # 返回紀錄字典，這樣可以在刪除時使用
+            records = []
+            for category in sorted(category_items.keys()):
+                items = sorted(category_items[category], key=lambda x: x[0])
+                for deadline, item in items:
+                    records.append({"name": item, "category": category, "deadline": deadline})
+            return records
+
     return "無紀錄"
+
+def get_add_records(user_id_or_group_id,user_message): #新增紀錄表項目
+    spreadsheet, _ = get_user_spreadsheet(user_id_or_group_id)
+    if user_message.startswith("#1 "):
+        item = user_message.replace("#1 ", "", 1).strip()
+    elif user_message.startswith("#新增項目 "):
+        item = user_message.replace("#新增項目 ", "", 1).strip()
+    parts = item.split(" ", 2)
+    if len(parts) == 3:
+        category = parts[0]  # 類別
+        name = parts[1]      # 名稱
+        name_date = parts[2] # 日期
+            
+        if "/" in name_date: # 確認日期格式
+            date_parts = name_date.split("/")
+            if len(date_parts) == 2: # MM/DD
+                year = datetime.now().year
+                month = int(date_parts[0])
+                day = int(date_parts[1])
+                name_date = f"{year}/{month:02d}/{day:02d}"
+            elif len(date_parts) == 3: # YYYY/MM/DD 格式，直接使用
+                year = int(date_parts[0])
+                month = int(date_parts[1])
+                day = int(date_parts[2])
+                if month < 1 or month > 12 or day < 1 or day > 31:
+                    return "日期格式不正確，請使用有效的日期 (MM/DD 或 YYYY/MM/DD 格式)。"
+                name_date = f"{year}/{month:02d}/{day:02d}"
+
+        record_sheet = spreadsheet.worksheet("紀錄表")
+        record_sheet.append_row([category,name,name_date])
+        return f"已新增 ({category}) {name} {name_date}"
+    else:
+        return "格式錯誤，請使用「#1 類別 名稱 日期」格式。"
+
+def get_delete_records(user_id_or_group_id,user_message): #刪除紀錄表項目
+    spreadsheet, _ = get_user_spreadsheet(user_id_or_group_id)
+    if user_message.startswith("#2 "):
+        item = user_message.replace("#2 ", "", 1).strip()
+    elif user_message.startswith("#刪除項目 "):
+        item = user_message.replace("#刪除項目 ", "", 1).strip()
+    
+    record_sheet = spreadsheet.worksheet("紀錄表")
+    if item.isdigit():  # 輸入的是編號
+        print("刪除編號:" + item)
+        record_id = int(item)
+        records = get_reading_records(user_id_or_group_id,command_type = "delete")
+        print("字典:")
+        print(records)
+        if record_id <= len(records): #確保有編號
+            delete_id = records[record_id -1]
+            item = delete_id['name']
+        else:
+            return "無效的編號，請重新輸入有效的編號。"
+        
+    print("刪除名稱:" + item)
+    names = record_sheet.col_values(2)  # 讀第一欄名字
+    if item in names :
+        row_index = names.index(item) +1# index從0開始，row從1開始
+        record_sheet.delete_rows(row_index)
+        return f"已刪除 {item}"
+    else :
+        return "找不到項目"
 
 def get_all_due_dates(): ## 給reminder用
     all_records = master_sheet.get_all_records()

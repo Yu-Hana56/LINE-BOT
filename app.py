@@ -1,4 +1,4 @@
-#20250426
+#20250427
 
 from flask import Flask, request
 from linebot import LineBotApi, WebhookHandler
@@ -38,21 +38,19 @@ def callback():
         return "驗證失敗", 400
     return "OK", 200
 
-## 關鍵字回覆 ##
+## 針對各指令進行回覆 ##
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):  
     user_message = event.message.text
     user_id_or_group_id = event.source.group_id if event.source.type == "group" else event.source.user_id  # 取得個人或群組 ID
     print(f"收到訊息: {user_message} (來自: {user_id_or_group_id})")
 
-    if user_message == "我的ID": #  取得id
+    if user_message == "我的ID": # 取得ID
         reply_text = f"你的 ID 是：\n{user_id_or_group_id}"
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
         return
     
-    reply_message = google_sheet.get_response(user_id_or_group_id, user_message)
-    
-    if user_message == "功能":
+    if user_message == "功能": # 列出"功能"列
 
         flex_message_json ={"type": "bubble", "size": "micro",
                             "body": {"type": "box", "layout": "vertical", "contents": [
@@ -83,19 +81,37 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, flex_message)
         return
 
-    if user_message == "#關鍵字清單":
+    if user_message == "#關鍵字清單": # 列出所有關鍵字
         reply_message = google_sheet.get_all_keywords(user_id_or_group_id)
         text_message = TextSendMessage(text=reply_message)
         line_bot_api.reply_message(event.reply_token, text_message)
         return
 
-    if user_message == "#紀錄表":
-        reply_message =google_sheet.get_function_options(user_id_or_group_id)
+    if user_message == "#紀錄表": # 列出紀錄表
+        reply_message = google_sheet.get_reading_records(user_id_or_group_id)
         text_message = TextSendMessage(text=reply_message)
         line_bot_api.reply_message(event.reply_token, text_message)
         return
+    
+    ## 紀錄表_新增 ##
+    if user_message.startswith("#1 ") or user_message.startswith('#新增項目 '):
+        print("執行紀錄表_新增")
+        reply_message = google_sheet.get_add_records(user_id_or_group_id,user_message)
+        text_message = TextSendMessage(text=reply_message)
+        line_bot_api.reply_message(event.reply_token, text_message)
+        return 
+        
+    ## 紀錄表_刪除 ##
+    if user_message.startswith("#2 ") or user_message.startswith('#刪除項目 '):
+        print("執行紀錄表_刪除")
+        reply_message = google_sheet.get_delete_records(user_id_or_group_id,user_message)
+        text_message = TextSendMessage(text=reply_message)
+        line_bot_api.reply_message(event.reply_token, text_message)
+        return 
 
-    if reply_message:
+    ## 回覆對應關鍵字 ##
+    reply_message = google_sheet.get_response(user_id_or_group_id, user_message)
+    if reply_message: 
         if reply_message.startswith("http"):
             image_message = ImageSendMessage(
                 original_content_url=reply_message, 
@@ -130,4 +146,3 @@ def start_reminder_scheduler():
 if __name__ == "__main__":
     start_reminder_scheduler()
     app.run(host="0.0.0.0", port=8000)
-    

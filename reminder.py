@@ -1,4 +1,4 @@
-#20250426
+#20250427
 
 from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta
@@ -13,6 +13,7 @@ import google_sheet  # 匯入 google_sheet 操作模組
 
 #  小幫手
 LINE_CHANNEL_ACCESS_TOKEN = "d187fh/lwQnmxlSrJCr9oBnPpiY6PXqtjHj7T23RwqN7xOb5zCOYwE3BAFsZYgsZDgn6SuA/hpRcdHBO5/40cfLUHmHX9G5RcwyhR5Tv1IyReAXtE7/EpeDuAgVjvZ5MpD8WasTWG/iE9iedjXcu4AdB04t89/1O/w1cDnyilFU="
+
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 
@@ -83,7 +84,7 @@ def run_scheduler():
         today = now.date()
         current_time = now.time()  # 使用時間對象比較
 
-        if today == next_notify_date and current_time >= datetime.strptime("21:49", "%H:%M").time():
+        if today == next_notify_date and current_time >= datetime.strptime("20:40", "%H:%M").time():
             send_reminder()
             next_notify_date = today + timedelta(days=1)
 

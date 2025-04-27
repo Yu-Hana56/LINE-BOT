@@ -6,8 +6,6 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import random
 from datetime import datetime
-from linebot.models import TextSendMessage, QuickReply, QuickReplyButton, MessageAction
-
 
 # 設定 Google API 權限
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]

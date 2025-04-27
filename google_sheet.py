@@ -87,7 +87,7 @@ def get_response(user_id_or_group_id,user_message):  #回傳對應的回應內�
         
     ## 紀錄表_刪除 ##
     if user_message.startswith("#2 "):
-        item = user_message.replace("#2目 ", "").strip()
+        item = user_message.replace("#2 ", "").strip()
         record_sheet = spreadsheet.worksheet("紀錄表")
         names = record_sheet.col_values(2)  # 讀第一欄名字
         if item in names :

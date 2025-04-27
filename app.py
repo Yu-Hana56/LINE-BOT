@@ -50,7 +50,7 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
         return
     
-    if user_message == "功能": # 列出"功能"列
+    if user_message == "#功能": # 列出"功能"列
 
         flex_message_json ={"type": "bubble", "size": "micro",
                             "body": {"type": "box", "layout": "vertical", "contents": [

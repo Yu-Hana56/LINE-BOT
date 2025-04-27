@@ -1,4 +1,4 @@
-#20250427
+#20250427_2
 
 from flask import Flask, request
 from linebot import LineBotApi, WebhookHandler
@@ -14,6 +14,7 @@ app = Flask(__name__)
 #  測試員
 #LINE_CHANNEL_ACCESS_TOKEN = "WDZuclPojc3qvkky3UTFWiZqByyD2CZCg7W4nUcAakLtq2UElgColm5yLNcQJjzg88VhfN06YKNSeU0T8HSne+IVW3ENnlSA3A008suYKlypRRRenKssCTGKH3uGT/ztbukbiu5+DcvZVHZcUPtkeAdB04t89/1O/w1cDnyilFU="
 #LINE_CHANNEL_SECRET = "7b432f773cac5194ece7799b4be9cb28"
+
 
 #  小幫手
 LINE_CHANNEL_ACCESS_TOKEN = "d187fh/lwQnmxlSrJCr9oBnPpiY6PXqtjHj7T23RwqN7xOb5zCOYwE3BAFsZYgsZDgn6SuA/hpRcdHBO5/40cfLUHmHX9G5RcwyhR5Tv1IyReAXtE7/EpeDuAgVjvZ5MpD8WasTWG/iE9iedjXcu4AdB04t89/1O/w1cDnyilFU="
@@ -107,6 +108,15 @@ def handle_message(event):
         text_message = TextSendMessage(text=reply_message)
         line_bot_api.reply_message(event.reply_token, text_message)
         return 
+
+    ## 紀錄表_修改 ##
+    if user_message.startswith("#3 ") or user_message.startswith('#修改項目 '):
+        print("執行紀錄表_修改")
+        reply_message = google_sheet.get_modify_records(user_id_or_group_id,user_message)
+        text_message = TextSendMessage(text=reply_message)
+        line_bot_api.reply_message(event.reply_token, text_message)
+        return  
+    
 
     ## 回覆對應關鍵字 ##
     reply_message = google_sheet.get_response(user_id_or_group_id, user_message)

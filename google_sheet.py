@@ -1,13 +1,13 @@
-#20250427_3
+#20250428
+#改讀取紀錄表時間today ==>代入台灣時區
 
 import json
 import os
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import random
+from zoneinfo import ZoneInfo
 from datetime import datetime
-from linebot.models import TextSendMessage, QuickReply, QuickReplyButton, MessageAction
-
 
 # 設定 Google API 權限
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -88,7 +88,7 @@ def get_all_keywords(user_id_or_group_id):    # 讀取所有關鍵字，並回�
 
 def get_reading_records(user_id_or_group_id, command_type="list"):  #讀取紀錄表中項目欄
     spreadsheet, sheet_list = get_user_spreadsheet(user_id_or_group_id)
-    today = datetime.today().date()
+    today = datetime.now(ZoneInfo("Asia/Taipei")).date()
     if "紀錄表" in sheet_list:
         sheet = spreadsheet.worksheet("紀錄表")
         data = sheet.get_all_records()

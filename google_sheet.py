@@ -1,6 +1,9 @@
 #20250603_1
-#修改"#3 "時，後台print的結果
-#修改"#紀錄表",加上表頭
+## 修改"#3 "時，後台print的結果
+## 修改"#紀錄表"，加上表頭
+
+#20250603_2
+## 修改"#紀錄表#，取消日期與名稱中間的"-"
 
 import json
 import os
@@ -145,9 +148,9 @@ def get_reading_records(user_id_or_group_id, command_type="list"):  #讀取紀�
                 for deadline, item, quantity in items:
                     deadline = deadline.strftime("%Y/%m/%d")
                     if quantity.startswith("1") or quantity == "":
-                        result.append(f"{item_counter}. {deadline} - {item}")
+                        result.append(f"{item_counter}. {deadline} {item}")
                     else:
-                        result.append(f"{item_counter}. {deadline} - {item}*{quantity}")
+                        result.append(f"{item_counter}. {deadline} {item} *{quantity}")
                     item_counter += 1
 
             if expired_items: # 處理已過期資料
@@ -157,9 +160,9 @@ def get_reading_records(user_id_or_group_id, command_type="list"):  #讀取紀�
                 for deadline, item, quantity in expired_items:
                     deadline = deadline.strftime("%Y/%m/%d")
                     if quantity.startswith("1") or quantity == "":
-                        result.append(f"{item_counter}. {deadline} - {item}")
+                        result.append(f"{item_counter}. {deadline} {item}")
                     else:
-                        result.append(f"{item_counter}. {deadline} - {item}*{quantity}")
+                        result.append(f"{item_counter}. {deadline} {item} *{quantity}")
                     item_counter += 1
 
             return "\n".join(result)

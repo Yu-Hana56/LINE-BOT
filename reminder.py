@@ -76,7 +76,7 @@ def send_reminder():
 
 
 # 測試提醒使用(本地電腦)
-
+'''
 def run_scheduler():
     next_notify_date = datetime.today().date()
     while True:
@@ -89,8 +89,8 @@ def run_scheduler():
             next_notify_date = today + timedelta(days=1)
 
         time.sleep(60)# 每分鐘檢查一次，確保在預定時間發送提醒
-
+'''
 
 if __name__ == "__main__":
-    run_scheduler() #測試提醒使用(本地電腦)
-    #send_reminder()
+    #run_scheduler() #測試提醒使用(本地電腦)
+    send_reminder()

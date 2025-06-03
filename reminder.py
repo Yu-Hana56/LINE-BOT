@@ -1,4 +1,4 @@
-#20250427_2
+#20250603_1
 
 from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta
@@ -17,7 +17,7 @@ LINE_CHANNEL_ACCESS_TOKEN = "d187fh/lwQnmxlSrJCr9oBnPpiY6PXqtjHj7T23RwqN7xOb5zCO
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 
-# 取得紀錄表中的「名稱」和「截止日期」
+# 取得紀錄表中的「名稱」和「日期」
 def get_due_dates():
     return google_sheet.get_all_due_dates()
 
@@ -76,7 +76,7 @@ def send_reminder():
 
 
 # 測試提醒使用(本地電腦)
-'''
+
 def run_scheduler():
     next_notify_date = datetime.today().date()
     while True:
@@ -89,8 +89,8 @@ def run_scheduler():
             next_notify_date = today + timedelta(days=1)
 
         time.sleep(60)# 每分鐘檢查一次，確保在預定時間發送提醒
-'''
+
 
 if __name__ == "__main__":
-    #run_scheduler() #測試提醒使用(本地電腦)
-    send_reminder()
+    run_scheduler() #測試提醒使用(本地電腦)
+    #send_reminder()

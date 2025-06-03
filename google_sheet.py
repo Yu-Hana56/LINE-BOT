@@ -1,5 +1,6 @@
-#20250428
-#改讀取紀錄表時間today ==>代入台灣時區
+#20250603_1
+#修改"#3 "時，後台print的結果
+#修改"#紀錄表",加上表頭
 
 import json
 import os
@@ -13,7 +14,7 @@ from datetime import datetime
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
 ## 筆電用 ##
-#reds = ServiceAccountCredentials.from_json_keyfile_name("hana-linebot-e2cfe8a550b3.json", scope) 
+#creds = ServiceAccountCredentials.from_json_keyfile_name("hana-linebot-e2cfe8a550b3.json", scope) 
 
 ## Render用 ##
 service_account_info = json.loads(os.getenv("GOOGLE_CREDENTIALS"))
@@ -77,7 +78,18 @@ def get_response(user_id_or_group_id,user_message):  #回傳對應的回應內�
     
     ## 列出紀錄表_功能說明 ##
     if user_message == "#紀錄表_功能說明":
-        return "新增項目➡️\n　輸入「#1 」or 「#新增項目 」\n　加上「名稱 日期 數量」\n　例如:#1 冷藏 汽水 2025/04/27 6」\n刪除項目➡️\n　輸入「#2 」or「#刪除項目 」\n　加上「名稱(編號)」\n　例如:#2 汽水\n修改項目➡️\n　輸入「#3 」or「#修改項目 」\n　加上「名稱(編號) 欄位 修改後內容」\n　例如:#3 汽水 數量 5"
+        return ("新增項目➡️\n"
+                "　輸入「#1 」or 「#新增項目 」\n"
+                "　加上「名稱 日期 數量」\n"
+                "　例如:#1 冷藏 汽水 2025/04/27 6 \n"
+                "刪除項目➡️\n"
+                "　輸入「#2 」or「#刪除項目 」\n"
+                "　加上「名稱(編號)」\n"
+                "　例如:#2 汽水\n"
+                "修改項目➡️\n"
+                "　輸入「#3 」or「#修改項目 」\n"
+                "　加上「名稱(編號) 欄位 修改後內容」\n"
+                "　例如:#3 汽水 數量 5")
     return None
 
 def get_all_keywords(user_id_or_group_id):    # 讀取所有關鍵字，並回傳
@@ -98,7 +110,7 @@ def get_reading_records(user_id_or_group_id, command_type="list"):  #讀取紀�
         for row in data:
             category = str(row.get("類別", "")).strip()
             item = str(row.get("名稱", "")).strip()
-            deadline = str(row.get("截止日期", "")).strip()
+            deadline = str(row.get("日期", "")).strip()
             quantity = str(row.get("數量", "")).strip()
             if category and item and deadline:
                 try:
@@ -128,6 +140,7 @@ def get_reading_records(user_id_or_group_id, command_type="list"):  #讀取紀�
                 else:
                     result.append(f"\n------ {category} ------")
 
+                result.append("No. |    日期     |   名稱   | 數量")
                 items = sorted(category_items[category],key=lambda x: x[0])
                 for deadline, item, quantity in items:
                     deadline = deadline.strftime("%Y/%m/%d")
@@ -139,6 +152,7 @@ def get_reading_records(user_id_or_group_id, command_type="list"):  #讀取紀�
 
             if expired_items: # 處理已過期資料
                 result.append("\n------ 已過期 ------")
+                result.append("No. |    日期     |   名稱   | 數量")
                 expired_items.sort(key=lambda x: x[0])
                 for deadline, item, quantity in expired_items:
                     deadline = deadline.strftime("%Y/%m/%d")
@@ -220,7 +234,11 @@ def get_delete_records(user_id_or_group_id,user_message): #刪除紀錄表項目
     failed_items = []  # 找不到的
     record_sheet = spreadsheet.worksheet("紀錄表")
     records = get_reading_records(user_id_or_group_id,command_type = "delete")
-    print(records)
+    headers = ["name", "category", "deadline", "quantity"]
+    print("編號｜" + "｜".join(headers))
+    for i, record in enumerate(records, start=1):
+        row = [str(record.get(key, "")) for key in headers]
+        print(f"{i}｜" + "｜".join(row))
 
     names = record_sheet.col_values(2)  # 第二欄是名字
     for item in delete_list:
@@ -238,7 +256,7 @@ def get_delete_records(user_id_or_group_id,user_message): #刪除紀錄表項目
             if item in names :
                 # 篩選出所有相同名稱的項目
                 same_name_items = [record for record in records if record['name'] == item]
-                # 按照截止日期從舊到新排序
+                # 按照日期從舊到新排序
                 same_name_items.sort(key=lambda x: x['deadline'])
                 oldest_item = same_name_items[0] # 刪除最舊的項目
                 item_name = oldest_item['name']
@@ -258,7 +276,7 @@ def get_delete_records(user_id_or_group_id,user_message): #刪除紀錄表項目
 
         if found_row:
             record_sheet.delete_rows(found_row)
-            deleted_items.append(f"{item_name} (截止日期: {item_deadline.strftime('%Y/%m/%d')})")
+            deleted_items.append(f"{item_name} (日期: {item_deadline.strftime('%Y/%m/%d')})")
         else:
             failed_items.append(f"{item_name} (找不到符合的項目)")
 
@@ -290,7 +308,7 @@ def get_modify_records(user_id_or_group_id,user_message): #刪除紀錄表項目
     if fields in fields_row:
         col_index = fields_row.index(fields) + 1
     else:
-        return f"找不到欄位{fields}"
+        return f"找不到 {fields} 欄位"
     
     if name.isdigit():  # 輸入的是編號
         record_id = int(name)
@@ -320,7 +338,7 @@ def get_all_due_dates(): ## 給reminder用
             data = sheet.get_all_records()
             for item in data:
                 name = item.get("名稱")
-                deadline = item.get("截止日期")
+                deadline = item.get("日期")
                 if name and deadline:
                     try:
                         due_date = datetime.strptime(deadline, "%Y/%m/%d")

@@ -5,6 +5,9 @@
 #20250603_2
 ## 修改"#紀錄表#，取消日期與名稱中間的"-"
 
+#20550712_01
+## 修改"#新增"指令，由「類別 名稱 日期 數量」改為「類別 日期 名稱 數量」
+
 import json
 import os
 import gspread
@@ -188,17 +191,17 @@ def get_add_records(user_id_or_group_id,user_message): #新增紀錄表項目
         item = user_message.replace("#1 ", "", 1).strip()
     elif user_message.startswith("#新增項目 "):
         item = user_message.replace("#新增項目 ", "", 1).strip()
-    parts = item.split(" ") # 依照空格進行分割(類別 名稱 日期 數量)
+    parts = item.split(" ") # 依照空格進行分割(類別 日期 名稱 數量)
     if len(parts) == 3:
         category = parts[0]  # 類別
-        name = parts[1]      # 名稱
-        name_date = parts[2] # 日期
+        name_date = parts[1] # 日期
+        name = parts[2]      # 名稱
         quantity = 1 #數量預設1
     
     elif len(parts) == 4:
         category = parts[0]  # 類別
-        name = parts[1]      # 名稱
-        name_date = parts[2] # 日期
+        name_date = parts[1] # 日期
+        name = parts[2]      # 名稱
         quantity = parts[3] #數量
         if not quantity.isdigit():
             return "數量請輸入正整數！"
